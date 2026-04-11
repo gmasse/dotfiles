@@ -1,0 +1,120 @@
+# set homebrew environment
+if [[ -x "$HOME/homebrew/bin/brew" ]]
+then
+    eval "$($HOME/homebrew/bin/brew shellenv)"
+elif [[ -x "/opt/homebrew/bin/brew" ]]
+then
+    eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+fi
+
+# include user-specific binaries and scripts
+export BIN_DIR=$HOME/.local/bin
+export PATH=$BIN_DIR:$PATH
+[[ -d "$HOME/Library/Android/sdk" ]] && export PATH="$HOME/Library/Android/sdk/platform-tools:$HOME/Library/Android/sdk/emulator/:$PATH"
+[[ -d "/Applications/Visual Studio Code.app/Contents/Resources/app/bin" ]] && export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
+
+# set the locale of the shell
+export LANG=en_US.UTF-8
+export LC_ALL=$LANG
+export LC_CTYPE=$LANG
+
+# other environment variables
+export EDITOR=vim
+
+# aliases
+for f in ~/.config/zsh/aliases/*.zsh; do
+  source "$f"
+done
+
+# prevent accidental overwrite with redirection, to override: >| file
+setopt NO_CLOBBER
+
+# allow unmatched globs to remain literal instead of erroring
+setopt NO_NOMATCH
+
+# prevent sh-style word splitting on unquoted variables (safer expansions)
+setopt NO_SH_WORD_SPLIT
+
+# set the location and filename of the history file
+export HISTFILE="$HOME/.zsh_history"
+
+# set the maximum number of lines to be saved in the history file
+export HISTSIZE="100000"
+export SAVEHIST="$HISTSIZE"
+
+# enable comments "#" expressions in the prompt shell
+setopt INTERACTIVE_COMMENTS
+
+# append new history entries to the history file
+setopt APPEND_HISTORY
+
+# save each command to the history file as soon as it is executed
+setopt INC_APPEND_HISTORY
+
+# ignore recording duplicate consecutive commands in the history
+setopt HIST_IGNORE_DUPS
+
+# ignore commands that start with a space in the history
+setopt HIST_IGNORE_SPACE
+
+# share command history across all running zsh sessions
+setopt SHARE_HISTORY
+
+# enable completion
+autoload -U compinit; compinit
+# setopt GLOB_COMPLETE      # Show autocompletion menu with globs
+setopt MENU_COMPLETE        # Automatically highlight first element of completion menu
+setopt AUTO_LIST            # Automatically list choices on ambiguous completion.
+setopt COMPLETE_IN_WORD     # Complete from both ends of a word.
+zstyle ':completion:*' completer _extensions _complete _approximate # Define completers
+zstyle ':completion:*' use-cache on # Use cache for commands using cache
+zstyle ':completion:*' menu select # Allow you to select in a menu
+zstyle ':completion:*' group-name '' # Required for completion to be in good groups (named after the tags)
+zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+zstyle ':completion:*:*:*:*:descriptions' format '%F{blue}-- %D %d --%f'
+zstyle ':completion:*:*:*:*:messages' format ' %F{purple} -- %d --%f'
+zstyle ':completion:*:*:*:*:warnings' format ' %F{red}-- no matches found --%f'
+if ! [[ -v LS_COLORS ]]; then
+    if command -v dircolors >/dev/null 2>&1; then
+        eval "$(dircolors -b)"
+    elif command -v gdircolors >/dev/null 2>&1; then
+        eval "$(gdircolors -b)"
+    fi
+fi
+zstyle ':completion:*:*:*:*:default' list-colors ${(s.:.)LS_COLORS} # Colors for files and directory
+
+# load zsh plugins
+local _zsh_plugins="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/plugins"
+# source all plugins generically, except f-sy-h which must be loaded last
+for plugin in "$_zsh_plugins"/**/*.plugin.zsh(N); do
+  [[ "$plugin" == */f-sy-h/* ]] && continue
+  source "$plugin"
+done
+
+# search history using up and down keys
+typeset -g -A key
+key[Up]="${terminfo[kcuu1]}"
+key[Down]="${terminfo[kcud1]}"
+[[ -n "${key[Up]}"        ]] && bindkey -- "${key[Up]}"         history-substring-search-up
+[[ -n "${key[Down]}"      ]] && bindkey -- "${key[Down]}"       history-substring-search-down
+
+# Finally, make sure the terminal is in application mode, when zle is
+# active. Only then are the values from $terminfo valid.
+if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
+    autoload -Uz add-zle-hook-widget
+    function zle_application_mode_start { echoti smkx }
+    function zle_application_mode_stop { echoti rmkx }
+    add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
+    add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+fi
+
+# loading f-sy-h after other plugins and ZLE hooks
+source "$_zsh_plugins/f-sy-h/fast-syntax-highlighting.plugin.zsh"
+
+# search history using up and down keys
+#bindkey '^[[A' history-substring-search-up
+#bindkey '^[[B' history-substring-search-down
+
+# start starship prompt
+eval "$(starship init zsh)"
+

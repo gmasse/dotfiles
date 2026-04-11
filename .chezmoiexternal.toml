@@ -1,0 +1,61 @@
+# Zsh plugins
+[".config/zsh/plugins/zsh-autosuggestions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-autosuggestions"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+[".config/zsh/plugins/zsh-history-substring-search"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-history-substring-search"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+[".config/zsh/plugins/f-sy-h"]
+    type = "git-repo"
+    url = "https://github.com/zdharma-continuum/fast-syntax-highlighting"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+
+# Vim plugins
+[".vim/pack/plugins/start/editorconfig-vim"]
+    type = "git-repo"
+    url = "https://github.com/editorconfig/editorconfig-vim"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+[".vim/pack/plugins/start/vim-airline"]
+    type = "git-repo"
+    url = "https://github.com/vim-airline/vim-airline"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+[".vim/pack/plugins/start/catppuccin"]
+    type = "git-repo"
+    url = "https://github.com/catppuccin/vim"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+[".vim/pack/plugins/start/indentLine"]
+    type = "git-repo"
+    url = "https://github.com/Yggdroot/indentLine"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
+
+# Tmux Plugin Manager
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+    clone.args = ["--depth", "1"]
+    pull.args = ["--depth", "1"]
+
