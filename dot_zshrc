@@ -57,6 +57,9 @@ setopt HIST_IGNORE_DUPS
 # ignore commands that start with a space in the history
 setopt HIST_IGNORE_SPACE
 
+# remove superfluous blanks from commands before saving them to history
+setopt HIST_REDUCE_BLANKS
+
 # share command history across all running zsh sessions
 setopt SHARE_HISTORY
 
