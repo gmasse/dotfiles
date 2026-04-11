@@ -1,7 +1,7 @@
 # ── Docker Compose ─────────────────────────────────────
-alias dc='docker compose'
-alias dcu='docker compose up'
-alias dcd='docker compose down'
-alias dcps='docker compose ps'
-alias dclog='docker compose logs -f'
-alias dcex='docker compose exec'
+alias dc='sudo docker compose'
+alias dcu='sudo docker compose up'
+alias dcd='sudo docker compose down'
+alias dcps='sudo docker compose ps'
+alias dclog='sudo docker compose logs -f'
+alias dcex='sudo docker compose exec'
