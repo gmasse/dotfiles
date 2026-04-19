@@ -1,0 +1,51 @@
+{{- /*
+  Claude Code user settings.
+  Rendered conditionally per machine:
+    - RTK token-proxy hook is included when the `rtk` binary is on $PATH
+    - macOS notification hooks (osascript) are included only on darwin
+  Output JSON keys are alphabetized by toPrettyJson — Claude Code does not care.
+*/ -}}
+
+{{- /* Assemble PreToolUse entries conditionally */ -}}
+{{- $preToolUse := list -}}
+
+{{- /* RTK rewrites Bash commands via a hook script under ~/.claude/hooks/ */ -}}
+{{- if lookPath "rtk" -}}
+{{-   $preToolUse = append $preToolUse (dict
+        "matcher" "Bash"
+        "hooks" (list (dict "type" "command" "command" (joinPath .chezmoi.homeDir ".claude/hooks/rtk-rewrite.sh")))) -}}
+{{- end -}}
+
+{{- /* macOS desktop notification when Claude Code asks a question */ -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $preToolUse = append $preToolUse (dict
+        "matcher" "AskUserQuestion"
+        "hooks" (list (dict "type" "command" "command" `osascript -e 'display notification "Claude Code is asking a question" with title "Claude Code"'`))) -}}
+{{- end -}}
+
+{{- /* Compose the hooks object. Omit PreToolUse entirely if nothing added. */ -}}
+{{- $hooks := dict -}}
+{{- if $preToolUse -}}{{- $hooks = set $hooks "PreToolUse" $preToolUse -}}{{- end -}}
+
+{{- /* macOS notifications for task-end and permission-request events */ -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $hooks = set $hooks "Stop" (list (dict
+        "hooks" (list (dict "type" "command" "command" `osascript -e 'display notification "Claude Code has finished the task" with title "Claude Code"'`)))) -}}
+{{-   $hooks = set $hooks "PermissionRequest" (list (dict
+        "hooks" (list (dict "type" "command" "command" `osascript -e 'display notification "Claude Code is asking for permission" with title "Claude Code"'`)))) -}}
+{{- end -}}
+
+{{ dict
+    "attribution" (dict "commit" "" "pr" "")
+    "permissions" (dict
+        "allow" (list
+            "Read" "Glob" "Grep" "LS"
+            "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)")
+        "deny" (list
+            "Read(.env*)"
+            "Read(**/id_rsa*)"
+            "Read(**/*.pem)"
+            "Read(**/.netrc)"))
+    "hooks" $hooks
+    "effortLevel" "high"
+  | toPrettyJson }}
