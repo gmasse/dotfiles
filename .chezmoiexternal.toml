@@ -1,61 +1,60 @@
 # Zsh plugins
 [".config/zsh/plugins/zsh-autosuggestions"]
-    type = "git-repo"
-    url = "https://github.com/zsh-users/zsh-autosuggestions"
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 [".config/zsh/plugins/zsh-history-substring-search"]
-    type = "git-repo"
-    url = "https://github.com/zsh-users/zsh-history-substring-search"
+    type = "archive"
+    url = "https://github.com/zsh-users/zsh-history-substring-search/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 [".config/zsh/plugins/f-sy-h"]
-    type = "git-repo"
-    url = "https://github.com/zdharma-continuum/fast-syntax-highlighting"
+    type = "archive"
+    url = "https://github.com/zdharma-continuum/fast-syntax-highlighting/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 
 # Vim plugins
 [".vim/pack/plugins/start/editorconfig-vim"]
-    type = "git-repo"
-    url = "https://github.com/editorconfig/editorconfig-vim"
+    type = "archive"
+    url = "https://github.com/editorconfig/editorconfig-vim/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 [".vim/pack/plugins/start/vim-airline"]
-    type = "git-repo"
-    url = "https://github.com/vim-airline/vim-airline"
+    type = "archive"
+    url = "https://github.com/vim-airline/vim-airline/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 [".vim/pack/plugins/start/catppuccin"]
-    type = "git-repo"
-    url = "https://github.com/catppuccin/vim"
+    type = "archive"
+    url = "https://github.com/catppuccin/vim/archive/main.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 [".vim/pack/plugins/start/indentLine"]
-    type = "git-repo"
-    url = "https://github.com/Yggdroot/indentLine"
+    type = "archive"
+    url = "https://github.com/Yggdroot/indentLine/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
 
 
 # Tmux Plugin Manager
 [".tmux/plugins/tpm"]
-    type = "git-repo"
-    url = "https://github.com/tmux-plugins/tpm"
+    type = "archive"
+    url = "https://github.com/tmux-plugins/tpm/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
     refreshPeriod = "168h"
-    clone.args = ["--depth", "1"]
-    pull.args = ["--depth", "1"]
-
