@@ -51,10 +51,17 @@
     refreshPeriod = "168h"
 
 
-# Tmux Plugin Manager
-[".tmux/plugins/tpm"]
+# Tmux plugins
+[".tmux/plugins/tmux-cpu"]
     type = "archive"
-    url = "https://github.com/tmux-plugins/tpm/archive/master.tar.gz"
+    url = "https://github.com/tmux-plugins/tmux-cpu/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+[".tmux/plugins/catppuccin"]
+    type = "archive"
+    url = "https://github.com/catppuccin/tmux/archive/main.tar.gz"
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
