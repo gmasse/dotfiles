@@ -35,10 +35,11 @@
             "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)"
             "Bash(gh release list:*)" "Bash(gh release view:*)"
             "Bash(uv run ruff:*)" "Bash(uv run mypy:*)" "Bash(uv run pytest:*)" "Bash(uv run bandit:*)" "Bash(uv run pip-audit:*)"
-            "Bash(npm test:*)"
-            "Read(.env.example)")
+            "Bash(npm test:*)")
         "deny" (list
-            "Read(.env*)"
+            "Read(.env)"
+            "Read(.env.local)"
+            "Read(.env.*.local)"
             "Read(**/id_rsa*)"
             "Read(**/*.pem)"
             "Read(**/.netrc)"))
