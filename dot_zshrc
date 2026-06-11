@@ -27,7 +27,9 @@ for f in ~/.config/zsh/aliases/*.zsh; do
 done
 
 # prevent accidental overwrite with redirection, to override: >| file
-setopt NO_CLOBBER
+# skip under Claude Code: its non-interactive tool shell errors on `>` to an
+# existing file (and silently keeps the old contents)
+[[ -z "$CLAUDECODE" ]] && setopt NO_CLOBBER
 
 # allow unmatched globs to remain literal instead of erroring
 setopt NO_NOMATCH
