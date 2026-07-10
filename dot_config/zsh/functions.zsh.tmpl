@@ -1,0 +1,27 @@
+{{ if eq .chezmoi.os "darwin" -}}
+update-aws() {
+  local xml="$(mktemp)" tmpdir="$(mktemp -d)"
+  local pkg="$tmpdir/AWSCLIV2.pkg"
+  cat >| "$xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+    <dict>
+      <key>choiceAttribute</key>
+      <string>customLocation</string>
+      <key>attributeSetting</key>
+      <string>$HOME/.local/bin</string>
+      <key>choiceIdentifier</key>
+      <string>default</string>
+    </dict>
+  </array>
+</plist>
+EOF
+  curl -s "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "$pkg" && \
+  installer -pkg "$pkg" -target CurrentUserHomeDirectory \
+    -applyChoiceChangesXML "$xml" && \
+  aws --version
+  rm -rf "$tmpdir" "$xml"
+}
+{{ end -}}
