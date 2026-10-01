@@ -1,7 +1,8 @@
 {{- $arch := "x86_64" -}}
 {{- if eq .chezmoi.arch "arm64" }}{{ $arch = "aarch64" }}{{ end -}}
 {{- $target := "unknown-linux-musl" -}}
-{{- if eq .chezmoi.os "darwin" }}{{ $target = "apple-darwin" }}{{ end }}
+{{- if eq .chezmoi.os "darwin" }}{{ $target = "apple-darwin" }}{{ end -}}
+{{- $brand := "https://github.com/edgeweave-showroom/brand/archive/refs/heads/main.tar.gz" }}
 
 # Starship prompt
 [".local/bin/starship"]
@@ -50,13 +51,6 @@
     stripComponents = 1
     refreshPeriod = "168h"
 
-[".vim/pack/plugins/start/catppuccin"]
-    type = "archive"
-    url = "https://github.com/catppuccin/vim/archive/main.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-
 [".vim/pack/plugins/start/indentLine"]
     type = "archive"
     url = "https://github.com/Yggdroot/indentLine/archive/master.tar.gz"
@@ -73,9 +67,33 @@
     stripComponents = 1
     refreshPeriod = "168h"
 
+# Pinned: the Edgeweave theme below is written for this version
 [".tmux/plugins/catppuccin"]
     type = "archive"
-    url = "https://github.com/catppuccin/tmux/archive/main.tar.gz"
+    url = "https://github.com/catppuccin/tmux/archive/refs/tags/v2.3.1.tar.gz"
     exact = true
     stripComponents = 1
+
+
+# Edgeweave theme, from the brand repository
+[".vim/pack/plugins/start/edgeweave"]
+    type = "archive"
+    url = "{{ $brand }}"
+    exact = true
+    stripComponents = 3
+    include = ["*/theme/vim/**"]
+    refreshPeriod = "168h"
+
+[".config/tmux/edgeweave-dark-catppuccin.conf"]
+    type = "archive-file"
+    url = "{{ $brand }}"
+    stripComponents = 1
+    path = "theme/tmux/edgeweave-dark-catppuccin.conf"
+    refreshPeriod = "168h"
+
+[".config/starship.toml"]
+    type = "archive-file"
+    url = "{{ $brand }}"
+    stripComponents = 1
+    path = "theme/starship/edgeweave-dark.toml"
     refreshPeriod = "168h"
