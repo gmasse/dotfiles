@@ -1,3 +1,17 @@
+{{- $arch := "x86_64" -}}
+{{- if eq .chezmoi.arch "arm64" }}{{ $arch = "aarch64" }}{{ end -}}
+{{- $target := "unknown-linux-musl" -}}
+{{- if eq .chezmoi.os "darwin" }}{{ $target = "apple-darwin" }}{{ end }}
+
+# Starship prompt
+[".local/bin/starship"]
+    type = "archive-file"
+    url = "https://github.com/starship/starship/releases/latest/download/starship-{{ $arch }}-{{ $target }}.tar.gz"
+    path = "starship"
+    executable = true
+    refreshPeriod = "168h"
+
+
 # Zsh plugins
 [".config/zsh/plugins/zsh-autosuggestions"]
     type = "archive"
