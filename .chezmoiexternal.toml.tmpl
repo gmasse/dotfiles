@@ -84,11 +84,12 @@
     include = ["*/theme/vim/**"]
     refreshPeriod = "168h"
 
-[".config/tmux/edgeweave-dark-catppuccin.conf"]
-    type = "archive-file"
+[".tmux/plugins/edgeweave"]
+    type = "archive"
     url = "{{ $brand }}"
-    stripComponents = 1
-    path = "theme/tmux/edgeweave-dark-catppuccin.conf"
+    exact = true
+    stripComponents = 3
+    include = ["*/theme/tmux/**"]
     refreshPeriod = "168h"
 
 [".config/starship.toml"]
