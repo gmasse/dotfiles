@@ -1,0 +1,8 @@
+#!/bin/sh
+if ! command -v jq >/dev/null 2>&1; then
+    echo "chezmoi: jq is required to manage ~/.claude/settings.json" >&2
+    exit 1
+fi
+current=$(cat)
+[ -z "$current" ] && current='{}'
+printf '%s' "$current" | jq --slurpfile m "{{ .chezmoi.sourceDir }}/claude-managed.json" '. * $m[0]'

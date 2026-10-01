@@ -1,0 +1,61 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "LS",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(gh release list:*)",
+      "Bash(gh release view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh run download:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run mypy:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run bandit:*)",
+      "Bash(uv run pip-audit:*)",
+      "Bash(npm test:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.*.local)",
+      "Read(**/id_rsa*)",
+      "Read(**/*.pem)",
+      "Read(**/.netrc)",
+      "Read(**/credentials.json)",
+      "Read(**/*.key)",
+      "Read(**/.aws/credentials)",
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git commit --no-verify:*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(aws ssm send-command:*)",
+      "Bash(tofu state rm:*)",
+      "Bash(terraform state rm:*)",
+      "Bash(gh repo delete:*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "disableClaudeAiConnectors": true,
+  "extraKnownMarketplaces": {
+    "edgeweave": {
+      "source": {
+        "source": "github",
+        "repo": "Edgeweave/claude-plugins"
+      },
+      "autoUpdate": true
+    }
+  }
+}

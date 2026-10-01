@@ -1,17 +1,9 @@
-{{- /*
-  Claude Code user-global instructions.
-  @RTK.md is included only when the `rtk` binary is on $PATH.
-*/ -}}
-{{ if lookPath "rtk" -}}
-@RTK.md
-
-{{ end -}}
 # Global conventions
 
 ## Development principles
 - Keep linter, formatter, and type checker strict and green. Never weaken a rule to avoid fixing code.
 - Prefer standard-library / framework APIs over custom code. Only write custom when no suitable option exists.
-- No dead code, no speculative abstractions, no comments that restate what the code does.
+- No dead code, no speculative abstractions.
 
 ## Security rules
 - Config via env vars; never hardcode secrets, tokens, credentials, or private keys.
@@ -28,5 +20,3 @@
 ## Working style
 - When a repo has its own `CLAUDE.md`, its rules override anything generic here.
 - Before edits in an unfamiliar repo, check `README.md`, `CLAUDE.md`, `CONCEPT.md`, `PLAN.md`, or `docs/` for context.
-- State assumptions explicitly when a task is ambiguous; prefer asking over guessing on irreversible actions.
-- Reference code with `path:line` so locations are clickable.
