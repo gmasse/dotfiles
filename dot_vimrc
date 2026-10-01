@@ -41,17 +41,14 @@ let g:markdown_syntax_conceal=0
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-" enable 24-bit true colors (required for catppuccin)
+" enable 24-bit true colors (required for edgeweave)
 if has('termguicolors')
   set termguicolors
 endif
 
-" set catppuccin flavor before loading colorscheme
-let g:catppuccin_flavour = "mocha" " options: latte, frappe, macchiato, mocha
-
 " load colorscheme
-colorscheme catppuccin_mocha
+colorscheme edgeweave
 
 " vim-airline (must come after colorscheme)
 let g:airline_powerline_fonts=1
-let g:airline_theme = 'catppuccin_mocha'
+let g:airline_theme = 'edgeweave'
