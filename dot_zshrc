@@ -22,9 +22,13 @@ export LC_CTYPE=$LANG
 export EDITOR=vim
 
 # aliases
-for f in ~/.config/zsh/aliases/*.zsh; do
-  source "$f"
-done
+# skip under Claude Code: its non-interactive tool shell would inherit them,
+# and `cp -i`/`mv -i`/`ln -i` read EOF as "no" and refuse to overwrite
+if [[ -z "$CLAUDECODE" ]]; then
+  for f in ~/.config/zsh/aliases/*.zsh; do
+    source "$f"
+  done
+fi
 
 # functions, only deployed on the systems that have some
 [[ -f ~/.config/zsh/functions.zsh ]] && source ~/.config/zsh/functions.zsh
