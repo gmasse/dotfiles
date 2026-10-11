@@ -63,6 +63,11 @@ jobs:
         run: chezmoi verify --source "$GITHUB_WORKSPACE"
       - name: Require the managed settings to win over the local ones, and the rest to stay
         run: jq -e --slurpfile managed claude-managed.json '.model == "local" and . * $managed[0] == .' ~/.claude/settings.json
+      # The image leaves directories in zsh's fpath that compaudit deems
+      # insecure, and compinit gives up without a terminal to ask.
+      - name: Secure the runner's zsh completion directories
+        if: runner.os == 'Linux'
+        run: zsh -fc 'autoload -U compaudit; compaudit' | xargs -r -t sudo chmod g-w,o-w
       - name: Start zsh without errors
         run: |
           if ! errors=$(zsh -i -c exit 2>&1 </dev/null) || [ -n "$errors" ]; then
