@@ -123,3 +123,19 @@ declared in [`.chezmoiexternal.toml.tmpl`](.chezmoiexternal.toml.tmpl) and downl
 - `catppuccin/tmux` is pinned to v2.3.1, the version the Edgeweave tmux colours are written for. Upgrade
   both together.
 - Starship lands in `~/.local/bin`, which comes first in `$PATH`.
+
+## CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request and every push to `main`:
+
+- On Ubuntu and macOS, `chezmoi apply` with the externals, over a Claude Code `settings.json` that has a
+  local key and a local permission. A second apply must change nothing (`chezmoi verify`), the merge must
+  keep the key and drop the permission, and zsh, Vim, tmux and the status line must start without an
+  error or a warning.
+- shellcheck on every `sh` and `bash` script. It does not read zsh: starting zsh covers those files.
+- actionlint and zizmor on the workflows, gitleaks on the whole history.
+
+Dependabot updates the actions. chezmoi and the Docker images are pinned in the workflow by hand: update a
+version together with its checksums or digest.
+
+`.github/` needs no `.chezmoiignore` entry: chezmoi skips every source file starting with a dot.

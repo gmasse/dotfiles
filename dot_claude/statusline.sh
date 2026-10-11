@@ -18,7 +18,9 @@ orca="$HOME/.orca/agent-hooks/claude-statusline.sh"
 
 # One jq pass. The context % is derived from current_usage tokens because
 # context_window.used_percentage is a rounded integer; formatting stays in jq
-# so the decimal separator never depends on the locale.
+# so the decimal separator never depends on the locale. The variables it sets
+# start empty, never inherited from the environment if jq fails.
+dir='' dir_label='' model='' fast='' effort='' added='' removed='' pct='' tier='' bar=''
 eval "$(printf '%s' "$input" | jq -r '
   .context_window as $cw
   | $cw.current_usage as $u
@@ -46,8 +48,8 @@ eval "$(printf '%s' "$input" | jq -r '
 ')"
 
 e=$(printf '\033')
-reset="$e[0m" dim="$e[2m"
-red="$e[31m" green="$e[32m" yellow="$e[33m" magenta="$e[35m" cyan="$e[36m"
+reset="${e}[0m" dim="${e}[2m"
+red="${e}[31m" green="${e}[32m" yellow="${e}[33m" magenta="${e}[35m" cyan="${e}[36m"
 # Nerd Font nf-oct-git_branch (U+F418), the symbol starship's git_branch uses.
 branch_icon=$(printf '\357\220\230')
 
