@@ -57,7 +57,7 @@ A machine whose `~/.claude/CLAUDE.md` predates this setup keeps it untouched: re
 [`claude-managed.json`](claude-managed.json) into the existing file with `jq '. * $managed'`:
 
 - Keys absent from `claude-managed.json` are kept, so settings changed in Claude Code itself (model,
-  status line, plugins…) survive an apply.
+  plugins…) survive an apply.
 - Managed keys win on every apply. Change them in `claude-managed.json`, not with `/config`.
 - Arrays are replaced, not merged. A local entry in `permissions.allow` or `permissions.deny` is dropped
   on the next apply. Add shared rules to `claude-managed.json`, project rules to the project's
@@ -69,6 +69,27 @@ A machine whose `~/.claude/CLAUDE.md` predates this setup keeps it untouched: re
 `claude-managed.json` is listed in [`.chezmoiignore`](.chezmoiignore): the script reads it from the source
 directory and chezmoi never copies it to `$HOME`. Any other repository-only file at the root needs the same
 entry.
+
+### Status line: `~/.claude/statusline.sh`
+
+`claude-managed.json` points `statusLine` at [`dot_claude/statusline.sh`](dot_claude/statusline.sh): the
+folder relative to the project, the branch and its state, the lines Claude added and removed this session,
+the model with fast mode and effort, and the context used.
+
+```text
+edgevision/src    dev ✓    +247 -89    Fable 5.1 ⚡ (high)    █████░░░░░ 47.2 %
+```
+
+- Branch state: `✓` clean, `●` staged, `!` modified, `?` untracked, `✗` conflicted, `⇡`/`⇣` ahead/behind.
+- Colours come from the terminal's 16-colour palette, so they follow its light or dark theme, as Claude
+  Code's `auto` theme does. The context turns yellow from 50 % and red from 80 %.
+- It works with or without [Orca](https://github.com/stablyai/orca): when
+  `~/.orca/agent-hooks/claude-statusline.sh` exists, the script forwards its input to it, so Orca keeps its
+  usage feed. Orca rewrites any `statusLine` whose command names that path, so keep the path inside the
+  script, never in the command.
+- Orca only writes its script while it owns the slot. On a machine where this status line was applied
+  before Orca's first run, Orca polls usage instead. To restore the feed, delete `statusLine` from
+  `~/.claude/settings.json`, start Orca once, then run `chezmoi apply`.
 
 ### Project template
 
