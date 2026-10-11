@@ -49,6 +49,10 @@
     "defaultMode": "auto"
   },
   "disableClaudeAiConnectors": true,
+  "statusLine": {
+    "type": "command",
+    "command": "/bin/sh \"$HOME/.claude/statusline.sh\""
+  },
   "extraKnownMarketplaces": {
     "edgeweave": {
       "source": {
