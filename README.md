@@ -138,4 +138,10 @@ declared in [`.chezmoiexternal.toml.tmpl`](.chezmoiexternal.toml.tmpl) and downl
 Dependabot updates the actions. chezmoi and the Docker images are pinned in the workflow by hand: update a
 version together with its checksums or digest.
 
+Every Monday, the apply job runs again with the latest chezmoi instead of the pinned one, checked against
+its release's checksums file. A new machine installs the latest, so a failure there means a release
+breaks the dotfiles: fix them before bumping the pin. A pass means the pin can move to that release.
+GitHub mails the failure to whoever last changed the schedule, and disables it after 60 days without
+activity in the repository.
+
 `.github/` needs no `.chezmoiignore` entry: chezmoi skips every source file starting with a dot.

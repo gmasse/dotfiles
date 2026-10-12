@@ -5,12 +5,17 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Weekly, the apply job takes the latest chezmoi instead of the pinned one,
+  # and the externals as they are upstream: a release that breaks the dotfiles
+  # shows up before a machine installs it.
+  schedule:
+    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -41,12 +46,21 @@ jobs:
           VERSION: "2.72.2"
           PLATFORM: ${{ matrix.chezmoi-platform }}
           SHA256: ${{ matrix.chezmoi-sha256 }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           cd "$RUNNER_TEMP"
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            VERSION=$(gh release view --repo twpayne/chezmoi --json tagName --jq '.tagName | ltrimstr("v")')
+            # No checksum can be pinned ahead of the release: take its own.
+            SHA256=$(gh release download "v${VERSION}" --repo twpayne/chezmoi \
+                --pattern "chezmoi_${VERSION}_checksums.txt" --output - \
+              | awk -v archive="chezmoi_${VERSION}_${PLATFORM}.tar.gz" '$2 == archive { print $1 }')
+          fi
           archive="chezmoi_${VERSION}_${PLATFORM}.tar.gz"
           curl -fsSLO "https://github.com/twpayne/chezmoi/releases/download/v${VERSION}/${archive}"
           echo "${SHA256}  ${archive}" | shasum -a 256 --check
           tar -xzf "$archive" chezmoi
+          ./chezmoi --version
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
