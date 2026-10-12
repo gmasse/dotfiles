@@ -1,0 +1,169 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Weekly, the apply job takes the latest chezmoi instead of the pinned one,
+  # and the externals as they are upstream: a release that breaks the dotfiles
+  # shows up before a machine installs it.
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Apply (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            chezmoi-platform: linux_amd64
+            chezmoi-sha256: a2be1b8bcdf06c6f173e070bb3ddbcc52c50478fe9b57f6e6c63d15c7cff4f03
+          - os: macos-latest
+            chezmoi-platform: darwin_arm64
+            chezmoi-sha256: 2b0c7e57f3f2da44628fa9f6863b9bd41f0935cfd2416228aa9df6daab6690f5
+    steps:
+      - name: Install zsh, Vim and tmux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tmux vim zsh
+      - name: Install tmux
+        if: runner.os == 'macOS'
+        run: brew install tmux
+      # Outside the workspace: chezmoi would apply any file left in the source.
+      - name: Install chezmoi
+        env:
+          VERSION: "2.72.2"
+          PLATFORM: ${{ matrix.chezmoi-platform }}
+          SHA256: ${{ matrix.chezmoi-sha256 }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "$RUNNER_TEMP"
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            VERSION=$(gh release view --repo twpayne/chezmoi --json tagName --jq '.tagName | ltrimstr("v")')
+            # No checksum can be pinned ahead of the release: take its own.
+            SHA256=$(gh release download "v${VERSION}" --repo twpayne/chezmoi \
+                --pattern "chezmoi_${VERSION}_checksums.txt" --output - \
+              | awk -v archive="chezmoi_${VERSION}_${PLATFORM}.tar.gz" '$2 == archive { print $1 }')
+          fi
+          archive="chezmoi_${VERSION}_${PLATFORM}.tar.gz"
+          curl -fsSLO "https://github.com/twpayne/chezmoi/releases/download/v${VERSION}/${archive}"
+          echo "${SHA256}  ${archive}" | shasum -a 256 --check
+          tar -xzf "$archive" chezmoi
+          ./chezmoi --version
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The merge must keep the local key and drop the local permission, since
+      # managed arrays replace local ones.
+      - name: Start from Claude Code settings with a local key and permission
+        run: |
+          mkdir -p ~/.claude
+          echo '{"model": "local", "permissions": {"allow": ["Bash(local:*)"]}}' > ~/.claude/settings.json
+      - name: Apply, externals included
+        run: chezmoi apply --source "$GITHUB_WORKSPACE"
+      - name: Require a second apply to change nothing
+        run: chezmoi verify --source "$GITHUB_WORKSPACE"
+      - name: Require the managed settings to win over the local ones, and the rest to stay
+        run: jq -e --slurpfile managed claude-managed.json '.model == "local" and . * $managed[0] == .' ~/.claude/settings.json
+      # The image leaves directories in zsh's fpath that compaudit deems
+      # insecure, and compinit gives up without a terminal to ask.
+      - name: Secure the runner's zsh completion directories
+        if: runner.os == 'Linux'
+        run: zsh -fc 'autoload -U compaudit; compaudit' | xargs -r -t sudo chmod g-w,o-w
+      - name: Start zsh without errors
+        run: |
+          if ! errors=$(zsh -i -c exit 2>&1 </dev/null) || [ -n "$errors" ]; then
+            printf '%s\n' "$errors"
+            exit 1
+          fi
+      - name: Start Vim without errors or warnings
+        env:
+          # Keeps the colour scheme's escape codes out of the output.
+          TERM: dumb
+        # Vim prints nothing in -Es mode: write out its message history, without
+        # the header :messages adds when $LANG is set.
+        run: |
+          if ! messages=$(vim -NEs -i NONE -u ~/.vimrc \
+              +'call writefile(filter(split(execute("messages"), "\n"), {_, m -> m !~# "^Messages maintainer"}), "/dev/stdout")' \
+              +'qa!' </dev/null) || [ -n "$messages" ]; then
+            printf '%s\n' "$messages"
+            exit 1
+          fi
+      - name: Load the tmux configuration without errors
+        run: |
+          if ! errors=$(tmux -f /dev/null new-session -d \; source-file ~/.tmux.conf \; kill-server 2>&1) || [ -n "$errors" ]; then
+            printf '%s\n' "$errors"
+            exit 1
+          fi
+      - name: Render the Claude Code status line
+        run: |
+          command=$(jq -r .statusLine.command ~/.claude/settings.json)
+          line=$(jq -n '{cwd: $ENV.GITHUB_WORKSPACE, model: {display_name: "Opus"}, context_window: {
+              context_window_size: 200000,
+              current_usage: {input_tokens: 50000, cache_creation_input_tokens: 0, cache_read_input_tokens: 0}}}' \
+            | sh -c "$command" 2>&1)
+          printf '%s\n' "$line"
+          # One line, without an error above it, and with the context used.
+          [[ $line != *$'\n'* && $line == *'25.0 %'* ]]
+
+  shellcheck:
+    name: Shell scripts (shellcheck)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Every tracked sh or bash script. shellcheck does not read zsh: the apply
+      # job starts zsh instead.
+      - name: shellcheck
+        run: >-
+          git grep -lzE '^#!/bin/(ba)?sh'
+          | xargs -0 docker run --rm -v "$GITHUB_WORKSPACE:/mnt:ro" -w /mnt
+          koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d
+
+  workflows:
+    name: Workflows (actionlint, zizmor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.19"
+      - name: actionlint
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -w /repo
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          -color
+      - name: zizmor
+        run: uvx zizmor@1.30.1 --offline --format=github .
+
+  secrets:
+    name: Secrets (gitleaks, full history)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: gitleaks
+        run: >-
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro"
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git /repo --redact --no-banner
