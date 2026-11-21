@@ -129,4 +129,4 @@ source "$_zsh_plugins/f-sy-h/fast-syntax-highlighting.plugin.zsh"
 eval "$(starship init zsh)"
 
 # machine-specific settings, kept out of chezmoi
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+if [[ -f ~/.zshrc.local ]]; then source ~/.zshrc.local; fi
