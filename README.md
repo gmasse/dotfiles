@@ -122,8 +122,10 @@ The Starship binary, the zsh, Vim and tmux plugins and the Edgeweave theme are c
 declared in [`.chezmoiexternal.toml.tmpl`](.chezmoiexternal.toml.tmpl) and downloaded again every 7 days.
 
 - Directories declared with `exact = true` are reset to the archive content: local edits there are lost.
-- `catppuccin/tmux` is pinned to v2.3.1, the version the Edgeweave tmux colours are written for. Upgrade
-  both together.
+- `catppuccin/tmux` is pinned to v2.3.1, the version the Edgeweave tmux colours are written for. Renovate
+  opens a pull request for each new release ([`.github/renovate.json`](.github/renovate.json)): merge it
+  once the brand repository supports that release, that is, once its `palette.toml` names it. The brand
+  repository runs the check, so this one has no CI for it.
 - Starship lands in `~/.local/bin`, which comes first in `$PATH`.
 
 ## CI
@@ -137,7 +139,8 @@ declared in [`.chezmoiexternal.toml.tmpl`](.chezmoiexternal.toml.tmpl) and downl
 - shellcheck on every `sh` and `bash` script. It does not read zsh: starting zsh covers those files.
 - actionlint and zizmor on the workflows, gitleaks on the whole history.
 
-Dependabot updates the actions. chezmoi and the Docker images are pinned in the workflow by hand: update a
+Dependabot updates the actions. Renovate only handles the Catppuccin pin (`enabledManagers`), since
+Dependabot cannot read a version inside a chezmoi URL. chezmoi and the Docker images are pinned in the workflow by hand: update a
 version together with its checksums or digest.
 
 Every Monday, the apply job runs again with the latest chezmoi instead of the pinned one, checked against
