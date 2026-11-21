@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["custom.regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.chezmoiexternal\\.toml\\.tmpl$/"],
+      "matchStrings": ["https://github\\.com/catppuccin/tmux/archive/refs/tags/(?<currentValue>v[^/]+)\\.tar\\.gz"],
+      "depNameTemplate": "catppuccin/tmux",
+      "datasourceTemplate": "github-tags"
+    }
+  ]
+}
