@@ -122,7 +122,7 @@ The Starship binary, the zsh, Vim and tmux plugins and the Edgeweave theme are c
 declared in [`.chezmoiexternal.toml.tmpl`](.chezmoiexternal.toml.tmpl) and downloaded again every 7 days.
 
 - Directories declared with `exact = true` are reset to the archive content: local edits there are lost.
-- `catppuccin/tmux` is pinned to v2.3.1, the version the Edgeweave tmux colours are written for. Renovate
+- `catppuccin/tmux` is pinned to the release the Edgeweave tmux colours are written for. Renovate
   opens a pull request for each new release ([`.github/renovate.json`](.github/renovate.json)): merge it
   once the brand repository supports that release, that is, once its `palette.toml` names it. The brand
   repository runs the check, so this one has no CI for it.
