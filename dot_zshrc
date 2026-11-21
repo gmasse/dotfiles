@@ -10,8 +10,6 @@ fi
 # include user-specific binaries and scripts
 export BIN_DIR=$HOME/.local/bin
 export PATH=$BIN_DIR:$PATH
-[[ -d "$HOME/Library/Android/sdk" ]] && export PATH="$HOME/Library/Android/sdk/platform-tools:$HOME/Library/Android/sdk/emulator/:$PATH"
-[[ -d "/Applications/Visual Studio Code.app/Contents/Resources/app/bin" ]] && export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 
 # set the locale of the shell
 export LANG=en_US.UTF-8
@@ -130,3 +128,5 @@ source "$_zsh_plugins/f-sy-h/fast-syntax-highlighting.plugin.zsh"
 # start starship prompt
 eval "$(starship init zsh)"
 
+# machine-specific settings, kept out of chezmoi
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

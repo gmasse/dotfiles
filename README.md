@@ -106,6 +106,8 @@ fill in the placeholders.
   must come last and is loaded on its own at the end.
 - A command typed with a leading space is not saved in the history. Up and Down search the history for
   the text already typed.
+- `~/.zshrc.local`, if it exists, is sourced last and is not managed by chezmoi: put settings that
+  belong to one machine there, such as the Android SDK, Android Studio's Java or VS Code's `code`.
 
 ## tmux
 
